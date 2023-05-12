@@ -295,6 +295,172 @@ class SegmentList(MultipleSegmentBase):
         write_child_node(xmlnode, 'SegmentURL', self.segment_urls)
 
 
+class Scte35SpliceTime(XMLNode):
+    def __init__(self):
+        self.pts_time = None
+
+    def parse(self, xmlnode):
+        self.pts_time = parse_attr_value(xmlnode, 'ptsTime', int)
+
+    def write(self, xmlnode):
+        write_attr_value(xmlnode, 'ptsTime', self.pts_time)
+
+
+class Scte35Program(XMLNode):
+    def __init__(self):
+        self.splice_time = None
+
+    def parse(self, xmlnode):
+        self.splice_time = parse_child_nodes(xmlnode, 'scte35:SpliceTime', Scte35SpliceTime)
+
+    def write(self, xmlnode):
+        write_child_node(xmlnode, 'scte35:SpliceTime', self.splice_time)
+
+
+class Scte35SpliceInsert(XMLNode):
+    def __init__(self):
+        self.splice_event_id = None
+        self.splice_event_cancel_indicator = None
+        self.out_of_network_indicator = None
+        self.splice_immediate_flag = None
+        self.unique_program_id = None
+        self.avail_num = None
+        self.avails_expected = None
+
+        self.program = None
+
+    def parse(self, xmlnode):
+        self.splice_event_id = parse_attr_value(xmlnode, 'spliceEventId', int)
+        self.splice_event_cancel_indicator = parse_attr_value(xmlnode, 'spliceEventCancelIndicator', bool)
+        self.out_of_network_indicator = parse_attr_value(xmlnode, 'outOfNetworkIndicator', bool)
+        self.splice_immediate_flag = parse_attr_value(xmlnode, 'spliceImmediateFlag', bool)
+        self.unique_program_id = parse_attr_value(xmlnode, 'uniqueProgramId', int)
+        self.avail_num = parse_attr_value(xmlnode, 'availNum', int)
+        self.avails_expected = parse_attr_value(xmlnode, 'availsExpected', int)
+
+        self.program = parse_child_nodes(xmlnode, 'scte35:Program', Scte35Program)
+
+    def write(self, xmlnode):
+        write_attr_value(xmlnode, 'spliceEventId', self.splice_event_id)
+        write_attr_value(xmlnode, 'spliceEventCancelIndicator', self.splice_event_cancel_indicator)
+        write_attr_value(xmlnode, 'outOfNetworkIndicator', self.out_of_network_indicator)
+        write_attr_value(xmlnode, 'spliceImmediateFlag', self.splice_immediate_flag)
+        write_attr_value(xmlnode, 'uniqueProgramId', self.unique_program_id)
+        write_attr_value(xmlnode, 'availNum', self.avail_num)
+        write_attr_value(xmlnode, 'availsExpected', self.avails_expected)
+
+        write_child_node(xmlnode, 'scte35:Program', self.program)
+
+
+class Scte35TimeSignal(XMLNode):
+    def __init__(self):
+        self.splice_time = None
+
+    def parse(self, xmlnode):
+        self.splice_time = parse_child_nodes(xmlnode, 'scte35:SpliceTime', Scte35SpliceTime)
+
+    def write(self, xmlnode):
+        write_child_node(xmlnode, 'scte35:SpliceTime', self.splice_time)
+
+
+class Scte35DeliveryRestrictions(XMLNode):
+    def __init__(self):
+        self.web_delivery_allowed_flag = None
+        self.no_regional_blackout_flag = None
+        self.archive_allowed_flag = None
+        self.device_restrictions = None
+
+    def parse(self, xmlnode):
+        self.web_delivery_allowed_flag = parse_attr_value(xmlnode, 'webDeliveryAllowedFlag', bool)
+        self.no_regional_blackout_flag = parse_attr_value(xmlnode, 'noRegionalBlackoutFlag', bool)
+        self.archive_allowed_flag = parse_attr_value(xmlnode, 'archiveAllowedFlag', bool)
+        self.device_restrictions = parse_attr_value(xmlnode, 'deviceRestrictions', int)
+
+    def write(self, xmlnode):
+        write_attr_value(xmlnode, 'webDeliveryAllowedFlag', self.web_delivery_allowed_flag)
+        write_attr_value(xmlnode, 'noRegionalBlackoutFlag', self.no_regional_blackout_flag)
+        write_attr_value(xmlnode, 'archiveAllowedFlag', self.archive_allowed_flag)
+        write_attr_value(xmlnode, 'deviceRestrictions', self.device_restrictions)
+
+
+class Scte35SegmentationUpid(XMLNode):
+    def __init__(self):
+        self.segmentation_upid_type = None
+        self.segmentation_upid_length = None
+        self.segmentation_type_id = None
+        self.segment_num = None
+        self.segments_expected = None
+
+    def parse(self, xmlnode):
+        self.segmentation_upid_type = parse_attr_value(xmlnode, 'segmentationUpidType', int)
+        self.segmentation_upid_length = parse_attr_value(xmlnode, 'segmentationUpidLength', int)
+        self.segmentation_type_id = parse_attr_value(xmlnode, 'segmentationTypeId', int)
+        self.segment_num = parse_attr_value(xmlnode, 'segmentNum', int)
+        self.segments_expected = parse_attr_value(xmlnode, 'segmentsExpected', int)
+
+    def write(self, xmlnode):
+        write_attr_value(xmlnode, 'segmentationUpidType', self.segmentation_upid_type)
+        write_attr_value(xmlnode, 'segmentationUpidLength', self.segmentation_upid_length)
+        write_attr_value(xmlnode, 'segmentationTypeId', self.segmentation_type_id)
+        write_attr_value(xmlnode, 'segmentNum', self.segment_num)
+        write_attr_value(xmlnode, 'segmentsExpected', self.segments_expected)
+
+
+class Scte35SegmentationDescriptor(XMLNode):
+    def __init__(self):
+        self.segmentation_event_id = None
+        self.segmentation_event_cancel_indicator = None
+        self.segmentation_duration = None
+
+        self.delivery_restrictions = None
+        self.segmentation_upid = None
+
+    def parse(self, xmlnode):
+        self.segmentation_event_id = parse_attr_value(xmlnode, 'segmentationEventId', int)
+        self.segmentation_event_cancel_indicator = parse_attr_value(xmlnode, 'segmentationEventCancelIndicator', bool)
+        self.segmentation_duration = parse_attr_value(xmlnode, 'segmentationDuration', int)
+
+        self.delivery_restrictions = parse_child_nodes(xmlnode, 'scte35:DeliveryRestrictions', Scte35DeliveryRestrictions)
+        self.segmentation_upid = parse_child_nodes(xmlnode, 'scte35:SegmentationUpid', Scte35SegmentationUpid)
+
+    def write(self, xmlnode):
+        write_attr_value(xmlnode, 'segmentationEventId', self.segmentation_event_id)
+        write_attr_value(xmlnode, 'segmentationEventCancelIndicator', self.segmentation_event_cancel_indicator)
+        write_attr_value(xmlnode, 'segmentationDuration', self.segmentation_duration)
+
+        write_child_node(xmlnode, 'scte35:DeliveryRestrictions', self.delivery_restrictions)
+        write_child_node(xmlnode, 'scte35:SegmentationUpid', self.segmentation_upid)
+
+
+class Scte35SpliceInfoSection(XMLNode):
+    def __init__(self):
+        self.protocol_version = None
+        self.pts_adjustment = None
+        self.tier = None
+
+        self.time_signal = None
+        self.splice_insert = None
+        self.segmentation_descriptor = None
+
+    def parse(self, xmlnode):
+        self.protocol_version = parse_attr_value(xmlnode, 'protocolVersion', int)
+        self.pts_adjustment = parse_attr_value(xmlnode, 'ptsAdjustment', int)
+        self.tier = parse_attr_value(xmlnode, 'tier', int)
+
+        self.time_signal = parse_child_nodes(xmlnode, 'scte35:TimeSignal', Scte35TimeSignal)
+        self.splice_insert = parse_child_nodes(xmlnode, 'scte35:SpliceInsert', Scte35SpliceInsert)
+        self.segmentation_descriptor = parse_child_nodes(xmlnode, 'scte35:SegmentationDescriptor', Scte35SegmentationDescriptor)
+
+    def write(self, xmlnode):
+        write_attr_value(xmlnode, 'protocolVersion', self.protocol_version)
+        write_attr_value(xmlnode, 'ptsAdjustment', self.pts_adjustment)
+        write_attr_value(xmlnode, 'tier', self.tier)
+
+        write_child_node(xmlnode, 'scte35:TimeSignal', self.time_signal)
+        write_child_node(xmlnode, 'scte35:SpliceInsert', self.splice_insert)
+        write_child_node(xmlnode, 'scte35:SegmentationDescriptor', self.segmentation_descriptor)
+
+
 class Event(XMLNode):
     def __init__(self):
         self.event_value = None                               # xs:string
@@ -302,6 +468,7 @@ class Event(XMLNode):
         self.presentation_time = None                         # xs:unsignedLong
         self.duration = None                                  # xs:unsignedLong
         self.id = None                                        # xs:unsignedInt
+        self.splice_info = None                               # Scte35SpliceInfoSection
 
     def parse(self, xmlnode):
         self.event_value = parse_node_value(xmlnode, str)
@@ -310,12 +477,16 @@ class Event(XMLNode):
         self.duration = parse_attr_value(xmlnode, 'duration', int)
         self.id = parse_attr_value(xmlnode, 'id', int)
 
+        self.splice_info = parse_child_nodes(xmlnode, 'scte35:SpliceInfoSection', Scte35SpliceInfoSection)
+
     def write(self, xmlnode):
         write_node_value(xmlnode, self.event_value)
         write_attr_value(xmlnode, 'messageData', self.message_data)
         write_attr_value(xmlnode, 'presentationTime', self.presentation_time)
         write_attr_value(xmlnode, 'duration', self.duration)
         write_attr_value(xmlnode, 'id', self.id)
+
+        write_child_node(xmlnode, 'scte35:SpliceInfoSection', self.splice_info)
 
 
 class Descriptor(XMLNode):
